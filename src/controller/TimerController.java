@@ -13,7 +13,7 @@ public class TimerController {
     private boolean isRunning;
     private Timeline timeline;
 
-    public interface TimerListener{
+    public interface TimerListener {
         void onTimeChanged(int min, int sec);
     }
 
@@ -32,12 +32,12 @@ public class TimerController {
         this.isRunning = true;
         this.timeline.play();
     }
-    
+
     public void stopTimer() {
         this.isRunning = false;
         this.timeline.stop();
     }
-    
+
     public void toggleTimer() {
         if (isRunning) {
             stopTimer();
@@ -60,7 +60,7 @@ public class TimerController {
             listeners.add(listener);
         }
     }
-    
+
     public void removeTimerListener(TimerListener listener) {
         listeners.remove(listener);
     }
@@ -71,5 +71,13 @@ public class TimerController {
         for (TimerListener listener : listeners) {
             listener.onTimeChanged(min, sec);
         }
+    }
+
+    public int getSeconds(){
+        return model.getSec();
+    }
+
+    public int getMin(){
+        return model.getMin();
     }
 }
