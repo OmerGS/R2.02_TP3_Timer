@@ -91,7 +91,12 @@ public class TimerController {
     }
 
     private void updateButtons() {
-        startStopButton.setText(isRunning ? "Stop" : "Start");
+        if (isRunning) {
+            startStopButton.setText("Stop");
+        } else {
+            startStopButton.setText("Start");
+        }
+
         resetButton.setDisable(isRunning);
     }
 
