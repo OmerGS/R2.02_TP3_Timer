@@ -32,8 +32,26 @@ public class TimerController {
         this.canvas = canvas;
 
         // Event handlers
-        this.startStopButton.setOnAction(this::toggleTimer);
-        this.resetButton.setOnAction(this::resetTimer);
+        this.startStopButton.setOnAction(event -> {
+            if (isRunning()) {
+                stopTimer();
+                startStopButton.setText("Start");
+                resetButton.setDisable(false);
+            } else {
+                startTimer();
+                startStopButton.setText("Stop");
+                resetButton.setDisable(true);
+            }
+        });
+
+        this.resetButton.setOnAction(event -> {
+            model.res();
+            updateUI();
+        });
+    }
+
+    public boolean isRunning(){
+        return(isRunning);
     }
 
     public void startTimer() {

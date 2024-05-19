@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+
 import javafx.util.Duration;
 import controller.TimerController;
 
@@ -123,3 +124,4 @@ public class TimerView extends Application {
         launch(args);
     }
 }
+
