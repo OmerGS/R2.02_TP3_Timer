@@ -1,32 +1,45 @@
 package controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcType;
 import javafx.util.Duration;
 import model.TimerModel;
 
 public class TimerController {
     private TimerModel model;
-    private List<TimerListener> listeners;
+    private Button startStopButton;
+    private Button resetButton;
+    private Label timerLabel;
+    private Canvas canvas;
     private boolean isRunning;
     private Timeline timeline;
 
-    public interface TimerListener {
-        void onTimeChanged(int min, int sec);
-    }
-
     public TimerController() {
         this.model = new TimerModel();
-        this.listeners = new ArrayList<>();
         this.isRunning = false;
+    }
+
+    public void initialize(Button startStopButton, Button resetButton, Label timerLabel, Canvas canvas) {
+        this.startStopButton = startStopButton;
+        this.resetButton = resetButton;
+        this.timerLabel = timerLabel;
+        this.canvas = canvas;
+
+        // Event handlers
+        this.startStopButton.setOnAction(this::toggleTimer);
+        this.resetButton.setOnAction(this::resetTimer);
     }
 
     public void startTimer() {
         this.timeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
             this.model.next();
-            notifyListeners();
+            updateUI();
         }));
         this.timeline.setCycleCount(Timeline.INDEFINITE);
         this.isRunning = true;
@@ -38,46 +51,46 @@ public class TimerController {
         this.timeline.stop();
     }
 
-    public void toggleTimer() {
+    public void toggleTimer(ActionEvent event) {
         if (isRunning) {
             stopTimer();
         } else {
             startTimer();
         }
+        updateUI();
     }
 
-    public void resetTimer() {
+    public void resetTimer(ActionEvent event) {
         model.res();
-        notifyListeners();
+        updateUI();
     }
 
-    public boolean isRunning() {
-        return isRunning;
+    private void updateUI() {
+        String time = String.format("%02d:%02d", model.getMin(), model.getSec());
+        timerLabel.setText(time);
+        updateButtons();
+        drawArc();
     }
 
-    public void addTimerListener(TimerListener listener) {
-        if (!listeners.contains(listener)) {
-            listeners.add(listener);
-        }
+    private void updateButtons() {
+        startStopButton.setText(isRunning ? "Stop" : "Start");
+        resetButton.setDisable(isRunning);
     }
 
-    public void removeTimerListener(TimerListener listener) {
-        listeners.remove(listener);
-    }
+    private void drawArc() {
+        int seconds = model.getSec();
+        double angle = (seconds / 60.0) * 360.0;
 
-    private void notifyListeners() {
-        int min = model.getMin();
-        int sec = model.getSec();
-        for (TimerListener listener : listeners) {
-            listener.onTimeChanged(min, sec);
-        }
-    }
+        canvas.getGraphicsContext2D().clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-    public int getSeconds(){
-        return model.getSec();
-    }
+        // Draw black circle
+        canvas.getGraphicsContext2D().setStroke(Color.BLACK);
+        canvas.getGraphicsContext2D().setLineWidth(10);
+        canvas.getGraphicsContext2D().strokeArc(20, 20, 160, 160, 90, 360, ArcType.OPEN);
 
-    public int getMin(){
-        return model.getMin();
+        // Draw red circle for seconds
+        canvas.getGraphicsContext2D().setStroke(Color.RED);
+        canvas.getGraphicsContext2D().setLineWidth(10);
+        canvas.getGraphicsContext2D().strokeArc(20, 20, 160, 160, 90, -angle, ArcType.OPEN);
     }
 }
